@@ -35,6 +35,7 @@ export class Visual implements IVisual {
       noUiSlider.create(slider, {
         start: [0, 100],
         connect: true,
+        orientation: 'vertical',
         range: {
           min: 0,
           max: 100,
