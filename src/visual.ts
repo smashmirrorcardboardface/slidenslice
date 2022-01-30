@@ -21,6 +21,7 @@ export class Visual implements IVisual {
   private target: HTMLElement;
   private container: HTMLElement;
   private settings: VisualSettings;
+  private slider;
 
   constructor(options: VisualConstructorOptions) {
     console.log('Visual constructor', options);
@@ -30,26 +31,41 @@ export class Visual implements IVisual {
       this.container.className = 'slicer-container';
       this.target.appendChild(this.container);
 
-      let slider = document.createElement('div');
-      slider.className = 'slider';
-      noUiSlider.create(slider, {
-        start: [0, 100],
-        connect: true,
+      this.slider = document.createElement('div');
+      this.slider.className = 'slider';
+      noUiSlider.create(this.slider, {
+        start: 0,
+        connect: [true, false],
         orientation: 'vertical',
         range: {
           min: 0,
           max: 100,
         },
+        step: 1,
       });
-      this.container.appendChild(slider);
+      this.container.appendChild(this.slider);
+
+      let sliderValue = document.createElement('div');
+      sliderValue.id = 'slider-value';
+      this.target.appendChild(sliderValue);
     }
   }
 
   public update(options: VisualUpdateOptions) {
+    var sliderValues = [document.getElementById('slider-value')];
+
     this.settings = Visual.parseSettings(options && options.dataViews && options.dataViews[0]);
     console.log('Visual update', options);
 
     transformData(options);
+
+    console.log('Visual data', data.values.length);
+
+    this.slider.noUiSlider.updateOptions({ range: { min: 0, max: data.values.length / 20 } });
+
+    this.slider.noUiSlider.on('update', function (values, handle) {
+      sliderValues[handle].innerHTML = values[handle];
+    });
 
     console.log('Visual data', data);
   }
